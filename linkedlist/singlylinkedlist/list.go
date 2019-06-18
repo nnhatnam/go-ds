@@ -1,21 +1,5 @@
 package singlylinkedlist
 
-// Node is a node of a linked list.
-type Node struct {
-
-	next *Node
-
-	// The list to which this element belongs.
-	//list *List
-
-	//The value stored with this node
-	Value interface{}
-}
-
-func newNode(value interface{}) *Node{
-	return &Node{Value:value}
-}
-
 type List struct {
 	head *Node // sentinel list element, only &root, root.prev, and root.next are used
 	tail *Node
@@ -97,6 +81,11 @@ func (l *List) Remove(n *Node) interface{}{
 	return nil
 }
 
+//need implement
+func (l *List) Clear() {
+
+}
+
 //Append a node to the end of the list O(1)
 func (l* List) Append(value interface{}){
 	l.appendOne(value)
@@ -127,6 +116,11 @@ func (l *List) appendMany(values ...interface{}) {
 	}
 }
 
+// Prepend a node to the beginning of the list
+func (l *List) Prepend(value interface{}){
+	l.prepend(value)
+}
+
 
 func (l *List) prepend(value interface{}){
 	if l.head == nil {
@@ -142,8 +136,8 @@ func (l *List) prepend(value interface{}){
 	l.len++
 }
 
-// Prepend a node to the beginning of the list
-func (l *List) Prepend(value interface{}){
-	l.prepend(value)
+//need implement with cache
+func (l *List) NodeAt(index int) *Node {
+	return nil
 }
 
