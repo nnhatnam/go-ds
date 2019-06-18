@@ -34,13 +34,72 @@ func New(values ...interface{}) *List{
 // The complexity is O(1).
 func (l *List) Len() int { return l.len }
 
+func (l *List) Back() *Node {
+	return l.tail
+}
+
 func (l *List) Front() *Node {
 	return l.head
 }
 
+//need implement
+func (l *List) InsertAfter(v interface{}, mark *Node) *Node {
+	return nil
+}
 
-func (l *List) Back() *Node {
-	return l.tail
+//need implement
+func (l *List) InsertBefore(v interface{}, mark *Node) *Node {
+	return nil
+}
+
+//need implement
+func (l *List) MoveAfter(n, mark *Node) {
+
+}
+
+//need implement
+func (l *List) MoveBefore(n, mark *Node){
+
+}
+
+//need implement
+func (l *List) MoveToBack(n *Node) {
+
+}
+
+//need implement
+func (l *List) MoveToFront(n *Node){
+
+}
+
+//need implement
+func (l *List) PushBack(v interface{}) *Node {
+	return nil
+}
+
+//need implement
+func (l *List) PushBackList(other *List){
+
+}
+
+//need implement
+func (l *List) PushFront(v interface{}) *Node {
+	return nil
+}
+
+//need implement
+func (l *List) PushFrontList(other *List){
+
+}
+
+//need implement
+func (l *List) Remove(n *Node) interface{}{
+	return nil
+}
+
+//Append a node to the end of the list O(1)
+func (l* List) Append(value interface{}){
+	l.appendOne(value)
 }
 
 func (l *List) appendOne(value interface{}){
@@ -64,13 +123,10 @@ func (l *List) appendOne(value interface{}){
 func (l *List) appendMany(values ...interface{}) {
 	for _, val := range values {
 		l.appendOne(val)
+		l.len++
 	}
 }
 
-//Append a node to the end of the list O(1)
-func (l* List) Append(value interface{}){
-	l.appendOne(value)
-}
 
 func (l *List) prepend(value interface{}){
 	if l.head == nil {
