@@ -16,6 +16,7 @@ func newNode(value interface{}, list *List) *Node{
 	return &Node{Value:value, list:list}
 }
 
+
 //need implement
 func (n *Node) Next() *Node {
 	return nil
