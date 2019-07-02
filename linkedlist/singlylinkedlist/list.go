@@ -1,5 +1,7 @@
 package singlylinkedlist
 
+import "fmt"
+
 type List struct {
 	//head *Node // sentinel list element, only &root, root.prev, and root.next are used
 	root *Node //root.next is the head
@@ -7,10 +9,16 @@ type List struct {
 	len int //  current list length excluding (this) sentinel element
 }
 
-
+func debug(format string, a ...interface{}){
+	fmt.Printf(format,a...)
+	fmt.Println("")
+}
 
 func (l *List) Init() *List {
-	l.root.next = newNode(nil,l)
+	//l.root = newNode(nil,&l)
+	node := &Node{list:l}
+
+	l.root = node
 	l.tail = l.root
 	l.len = 0
 	return l
@@ -25,9 +33,19 @@ func (l *List) lazyInit() {
 func New(values ...interface{}) *List{
 	list := (&List{}).Init()
 	if len(values) > 0 {
-		list.appendMany(values)
+		list.appendMany(values...)
 	}
 	return list
+}
+
+//for testing purpose only
+func (l *List) nodes() (nodes []*Node) {
+	if l.root != nil {
+		for node := l.Front(); node != nil; node = node.Next() {
+			nodes = append(nodes, node)
+		}
+	}
+	return
 }
 
 // Len returns the number of elements of list l.
@@ -54,34 +72,31 @@ func (l *List) Front() *Node {
 
 
 func (l *List) appendOne(value interface{}) * Node {
-	//node := newNode(value,l)
-	l.tail.next = newNode(value,l)
+
+	node := &Node{Value:value, list:l}
+	if l.root == l.tail {
+		l.root.next = node
+	}
+
+	l.tail.next = node
 	l.tail = l.tail.next
-	l.len++
-	return l.tail
-	//if l.head == nil {
-	//	l.head, l.tail = node, node
-	//	l.len++
-	//	return node
-	//}
-	//
-	//l.tail.next = node
-	//l.tail = node
-	//l.len++
-	//return node
+	l.len += 1
+	return node
+
 }
 
 func (l *List) appendMany(values ...interface{}) {
 	for _, val := range values {
 		l.appendOne(val)
-		l.len++
 	}
+
+	//fmt.Println("root after: ",l.root)
 }
 
 // Prepend a node to the beginning of the list
-func (l *List) Prepend(value interface{}){
-	l.prepend(value)
-}
+//func (l *List) Prepend(value interface{}){
+//	l.prepend(value)
+//}
 
 
 func (l *List) prepend(value interface{}) *Node{
@@ -91,6 +106,9 @@ func (l *List) prepend(value interface{}) *Node{
 		list:l,
 	}
 	l.root.next = node
+	if l.root == l.tail {
+		l.tail = node
+	}
 	//if l.head.next == nil {
 	//	l.tail = node
 	//}

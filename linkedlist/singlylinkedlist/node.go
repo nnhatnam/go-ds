@@ -12,17 +12,13 @@ type Node struct {
 	Value interface{}
 }
 
-func newNode(value interface{}, list *List) *Node{
-	return &Node{Value:value, list:list}
-}
 
 
-//need implement
 func (n *Node) Next() *Node {
-	return nil
+	return n.next
 }
 
-//need implement
-func (n *Node) Prev() *Node {
-	return nil
-}
+//
+//func (n *Node) Prev() *Node {
+//	return nil
+//}
