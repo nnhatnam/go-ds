@@ -158,6 +158,8 @@ func TestList(t *testing.T) {
 	//if actualValue := list.Len(); actualValue != 2 {
 	//	t.Errorf("Got %v expected %v", actualValue, 2)
 	//}
+
+	//test single node
 	list := New()
 	n := list.PushFront("a")
 	checkListPointers(t, list, []*Node{n})
@@ -166,5 +168,5 @@ func TestList(t *testing.T) {
 	checkListPointers(t, list, []*Node{n})
 	list.MoveToBack(n)
 	checkListPointers(t, list, []*Node{n})
-	
+
 }

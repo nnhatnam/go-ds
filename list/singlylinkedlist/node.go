@@ -17,8 +17,3 @@ type Node struct {
 func (n *Node) Next() *Node {
 	return n.next
 }
-
-//
-//func (n *Node) Prev() *Node {
-//	return nil
-//}

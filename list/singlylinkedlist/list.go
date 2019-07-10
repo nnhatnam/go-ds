@@ -109,9 +109,6 @@ func (l *List) prepend(value interface{}) *Node{
 	if l.root == l.tail {
 		l.tail = node
 	}
-	//if l.head.next == nil {
-	//	l.tail = node
-	//}
 
 	l.len++
 	return node
@@ -271,9 +268,6 @@ func (l *List) InsertBefore(v interface{}, mark *Node) *Node {
 	if mark.list != l {
 		return nil
 	}
-	//if l.head == mark {
-	//	return l.prepend(mark)
-	//}
 
 	nodeBeforeMark := l.lookup(func(n *Node) bool {
 		return n.next == mark
@@ -340,7 +334,11 @@ func (l *List) PushBack(v interface{}) *Node {
 
 //need implement
 func (l *List) PushBackList(other *List){
-
+	l.lazyInit()
+	for node := other.Front(); node != nil; node = node.Next() {
+		l.insertValue(node.Value, l.tail )
+		//nodes = append(nodes, node)
+	}
 }
 
 //need implement
@@ -350,20 +348,30 @@ func (l *List) PushFront(v interface{}) *Node {
 
 //need implement
 func (l *List) PushFrontList(other *List){
-
+	l.lazyInit()
+	for node := other.Front(); node != nil; node = node.Next() {
+		l.insertValue(node.Value, l.root )
+		//nodes = append(nodes, node)
+	}
 }
 
 func (l *List) remove(n *Node) *Node {
-	return nil
+	node := l.lookup(func(n *Node) bool {
+		return n.next == n
+	})
+	node.next = n.next
+	n.next = nil
+	n.list = nil
+	return n
 }
 
 //need implement
 func (l *List) Remove(n *Node) interface{}{
-	//node := l.lookup(func(n *Node) bool {
-	//	return n.next == n
-	//})
+	if n.list == l {
+		l.remove(n)
+	}
 
-	return nil
+	return n.Value
 }
 
 //need implement
