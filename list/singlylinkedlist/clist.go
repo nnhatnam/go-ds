@@ -1,3 +1,0 @@
-package singlylinkedlist
-
-//implement later

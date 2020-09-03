@@ -1,4 +1,4 @@
-package singlylinkedlist
+package llist
 
 type FlexList struct {
 	*List
