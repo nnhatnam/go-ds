@@ -1,4 +1,4 @@
-package llist
+package sllist
 
 // Node is a node of a linked list.
 type Node struct {
@@ -15,6 +15,8 @@ type Node struct {
 func (n *Node) Next() *Node {
 	return n.next
 }
+
+
 
 type sentinel struct {
 	head *Node
@@ -91,7 +93,7 @@ func (l *List) prepend(value interface{}) *Node{
 	return node
 }
 
-func (l *List) Size() int { return l.length }
+func (l *List) Len() int { return l.length }
 
 func (l *List) First() *Node {
 	return l.root.head
@@ -114,7 +116,7 @@ func (l *List) Prepend(value interface{}) *Node {
 
 
 type lookupFunc func(n *Node) bool //private find by node (index doesn't need, because we can access it in private level)
-type IterateFunc func(n *Node, position int) bool //find by value, add index for more flexible
+type IterateFunc func(n *Node, position int) //find by value, add index for more flexible
 
 //the same function like findOne, but doesn't provide index
 func (l *List) lookup(f lookupFunc) *Node {
@@ -137,16 +139,23 @@ func (l *List) Traverse(f IterateFunc){
 }
 
 
-//insert node n after node at, increments l.len, and return n, update tail if needed
-func (l *List) insert(n, after *Node) *Node {
-
-	n.list = l
-	n.next = after.next
-	after.next = n
-
-	if n.next == nil {
-		l.root.tail = n.next
+//insert node n after node "at", increments l.len, and return n, update tail if needed. Node "at" is nil, do nothing
+func (l *List) insert(n, at *Node) *Node {
+	if at == nil {
+		return nil
 	}
+
+	if l.root.tail == at {
+		l.root.tail = n
+	}
+	afterAt := at.next
+	at.next = n
+	n.next = afterAt
+	n.list = l
+	//n.next = at.next
+	//after.next = n
+
+
 	l.length++
 	return n
 }
@@ -170,6 +179,10 @@ func (l *List) InsertBefore(v interface{}, mark *Node) *Node {
 		return nil
 	}
 
+	if l.root.head == mark {
+		return l.prepend(v)
+	}
+
 	nodeBeforeMark := l.lookup(func(n *Node) bool {
 		return n.next == mark
 	})
@@ -178,20 +191,30 @@ func (l *List) InsertBefore(v interface{}, mark *Node) *Node {
 }
 
 //move node n after node at
-func (l *List) move(n, after *Node) *Node {
-	if n.list != l || after.list != l {
+func (l *List) move(n, at *Node) *Node {
+	if n.list != l || at.list != l {
 		return nil
 	}
-	if n == after || after.next == n {
+	if n == at || at.next == n {
 		return n
 	}
-	nodeBeforeN := l.lookup(func(node *Node) bool {
-		return node.next == n
-	})
-	nodeBeforeN.next = n.next
-	n.next = after.next
-	after.next = n
-	if l.root.tail == after {
+
+	if l.root.head == n {
+		l.root.head = n.next
+
+	} else {
+		nodeBeforeN := l.lookup(func(node *Node) bool {
+			return node.next == n
+		})
+		nodeBeforeN.next = n.next
+
+	}
+
+	afterAt := at.next
+	n.next = afterAt
+	at.next = n
+
+	if l.root.tail == at {
 		l.root.tail = n
 	}
 	return n
@@ -205,18 +228,20 @@ func (l *List) MoveAfter(n, mark *Node) {
 	l.move(n, mark)
 }
 
-//need implement
+// MoveBefore moves node n to its new position before mark.
+// If n or mark is not an node of l, or n == mark, the list is not modified.
+// The node and mark must not be nil.
 func (l *List) MoveBefore(n, mark *Node){
-	if n.list != l || n == mark || mark.list != l {
+	if n.list != l || n == mark || mark.list != l || n.next == mark {
 		return
 	}
-	temp := &Node{next:l.root.head}
+	temp := &Node{next:l.root.head, list:l,}
 	l.root.head = temp
 	nodeBeforeMark := l.lookup(func(n *Node) bool {
 		return n.next == mark
 	})
 	l.move(n, nodeBeforeMark)
-	l.root.head = l.root.head
+	l.root.head = l.root.head.next
 	temp.next = nil
 }
 
@@ -230,9 +255,18 @@ func (l *List) MoveToBack(n *Node) {
 
 //need implement
 func (l *List) MoveToFront(n *Node){
-	if n.list != l || l.root.tail == n {
+	if n.list != l || l.root.head == n {
 		return
 	}
+	prev := l.lookup(func(node *Node) bool {
+		return node.next == n
+	})
+	prev.next = n.next
+	n.next = l.root.head
+	if n == l.root.tail {
+		l.root.tail = prev
+	}
+	l.root.head = n
 }
 
 //need implement
@@ -243,10 +277,16 @@ func (l *List) PushBack(v interface{}) *Node {
 //need implement
 func (l *List) PushBackList(other *List){
 	l.lazyInit()
-	for node := other.First(); node != nil; node = node.Next() {
-		l.insertValue(node.Value, l.root.tail )
+	//can't use traverse due to infinite loop if the list push back itself
+	for i, node := other.Len(), other.First(); i > 0; i, node = i - 1,  node.Next() {
+		if l.root.head == nil {
+			l.append(node.Value)
+		} else {
+			l.insertValue(node.Value, l.root.tail )
+		}
 		//nodes = append(nodes, node)
 	}
+	//fmt.Println("out ", l.length)
 }
 
 //need implement
@@ -257,20 +297,45 @@ func (l *List) PushFront(v interface{}) *Node {
 //need implement
 func (l *List) PushFrontList(other *List){
 	l.lazyInit()
-	for node := other.First(); node != nil; node = node.Next() {
-		//l.insertValue(node.Value, l.root )
+	tail := l.root.tail
+	for i, node := other.Len(), other.First(); i > 0; i, node = i - 1,  node.Next() {
 		l.append(node.Value)
 		//nodes = append(nodes, node)
+	}
+
+	if tail != nil && l.root.tail != tail {
+		l.root.tail.next = l.root.head
+		l.root.head = tail.next
+		tail.next = nil
 	}
 }
 
 func (l *List) remove(n *Node) *Node {
-	node := l.lookup(func(n *Node) bool {
-		return n.next == n
-	})
-	node.next = n.next
+	if l.length == 0 || n.list != l {
+		return nil
+	}
+
+	if l.root.head == n {
+		l.root.head = n.next
+		if l.root.tail == n {
+			l.root.tail = nil
+		}
+	} else {
+
+		node := l.lookup(func(e *Node) bool {
+			return e.next == n
+		})
+
+		node.next = n.next
+		if l.root.tail == n {
+			l.root.tail = node
+		}
+
+	}
+
 	n.next = nil
 	n.list = nil
+	l.length -= 1
 	return n
 }
 
