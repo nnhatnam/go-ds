@@ -1,2 +1,1 @@
-# algorithms
-Go data structures and algorithms
+Data structures
