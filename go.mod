@@ -1,5 +1,5 @@
-module github.com/nnhatnam/algorithms
+module github.com/nnhatnam/go-ds
 
-go 1.12
+go 1.15
 
-require github.com/labstack/echo/v4 v4.1.6 // indirect
+//require github.com/labstack/echo/v4 v4.1.6
