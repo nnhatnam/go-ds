@@ -1,9 +1,5 @@
 package stack
 
-//import (
-//	"github.com/nnhatnam/go-ds/linearlists/dllist"
-//)
-
 // When we use stack, we care more about value instead of node, so node should be private
 type node struct {
 	next *node
@@ -78,7 +74,7 @@ func (s *Stack) Pop() interface{} {
 	return s.list.RemoveFront()
 }
 
-func (s *Stack) Top() interface{} {
+func (s *Stack) Peek() interface{} {
 	return s.list.Front()
 }
 
@@ -90,3 +86,6 @@ func (s *Stack) IsEmpty() bool {
 	return s.list.Len() == 0
 }
 
+func (s *Stack) Clear() {
+	s.list.Init()
+}
