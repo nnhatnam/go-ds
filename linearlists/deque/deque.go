@@ -1,15 +1,19 @@
 package deque
 
-type node struct {
-	next, prev *node
+type (
 
-	value interface{}
-}
+	node struct {
+		next, prev *node
 
-type list struct {
-	head, tail *node
-	len int
-}
+		value interface{}
+	}
+
+ 	list struct {
+		head, tail *node
+		len int
+	}
+
+)
 
 
 func newList() *list { return new(list).Init()}
