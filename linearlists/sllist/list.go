@@ -79,7 +79,7 @@ func (l *List) appendMany(values ...interface{}) {
 	//fmt.Println("root after: ",l.root)
 }
 
-func (l *List) prepend(value interface{}) *Node{
+func (l *List) prepend(value interface{}) *Node {
 	node := &Node{
 		next:l.root.head,
 		Value:value,

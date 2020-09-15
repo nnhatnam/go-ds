@@ -1,0 +1,3 @@
+A stack is a linear list for which all insertions and deletions (and usually all accesses) are made at one end of the list
+
+Other names: push-down lists, reversion storages, cellars, nesting stores, piles, last-in-first-out ("LIFO") lists, yo-yo lists

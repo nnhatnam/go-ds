@@ -50,6 +50,7 @@ type List struct {
 	len  int     // current list length excluding (this) sentinel element
 }
 
+
 // Init initializes or clears list l.
 func (l *List) Init() *List {
 	l.root.next = &l.root
@@ -86,6 +87,22 @@ func (l *List) lazyInit() {
 	if l.root.next == nil {
 		l.Init()
 	}
+}
+
+//func (l *List) prepend(value interface{}) *Node{
+//	l.lazyInit()
+//	return l.insertValue(value, &l.root)
+//}
+
+// Prepend a node to the beginning of the list
+func (l *List) Prepend(value interface{}) *Node {
+	l.lazyInit()
+	return l.insertValue(value, &l.root)
+}
+
+func (l *List) Append(value interface{}) *Node {
+	l.lazyInit()
+	return l.insertValue(value, l.root.prev)
 }
 
 // insert inserts e after at, increments l.len, and returns e.
