@@ -1,65 +1,76 @@
 package bst
 
+import "github.com/nnhatnam/go-ds/trees"
+
 type Node struct {
 	Left *Node
 	Right *Node
-	Data int
+	Key interface{}
+	Value interface{}
 }
 
-func NewNode(data int) *Node {
-	return &Node{Data:data,}
+type TraverseFunc func(interface{}, interface{})
+
+func NewNode(k, v interface{}) *Node {
+	return &Node{Key: k, Value:v,}
 }
 
-func (n *Node) Insert(data int) {
-	if n == nil {
+
+//func (node *Node) insert(k, v interface{}, compare trees.CompareFunc) {
+//	if node == nil || compare(k, node.Key) == 0 {
+//		return
+//	}
+//
+//	switch compare(k, node.Key){
+//	case 1:
+//		if node.Right == nil {
+//			node.addRightChild(k, v)
+//		} else {
+//			insert(node.Right, k, v, compare)
+//		}
+//	case -1:
+//		if node.Left == nil {
+//			node.addLeftChild(k, v )
+//		} else {
+//			insert(node.Left,k, v, compare)
+//		}
+//	default:
+//		return
+//	}
+//
+//}
+
+func (node *Node) addLeftChild(k, v interface{}) {
+	if node == nil {
 		return
 	}
 
-	if data <= n.Data {
-		if n.Left == nil {
-			n.addLeftChild(data)
-		} else {
-			n.Left.Insert(data)
-		}
-	} else {
-		if n.Right == nil {
-			n.addRightChild(data)
-		} else {
-			n.Right.Insert(data)
-		}
-	}
+	node.Left = &Node{Key: k, Value: v,}
 }
 
-
-func (n *Node) addLeftChild(key int) {
-	if n == nil {
+func (node *Node) addRightChild(k, v interface{}) {
+	if node == nil {
 		return
 	}
 
-	n.Left = &Node{Data: key,}
+	node.Right = &Node{Key: k, Value: v,}
 }
 
-func (n *Node) addRightChild(key int) {
-	if n == nil {
-		return
-	}
-
-	n.Right = &Node{Data: key,}
+func (node *Node) hasRightChild() bool {
+	return node.Right != nil
 }
 
-func (n *Node) hasRightChild() bool {
-	return n.Right != nil
-}
-
-func (n *Node) hasLeftChild() bool {
-	return n.Left != nil
+func (node *Node) hasLeftChild() bool {
+	return node.Left != nil
 }
 
 
 
 type BST struct {
 	Root *Node
-	size int
+	Size int
+
+	compareFunc trees.CompareFunc
 }
 
 /*
@@ -79,6 +90,30 @@ func maxDepth(node *Node) int {
 	return rDepth + 1
 }
 
+func insert(node *Node, k, v interface{}, compare trees.CompareFunc) {
+	if node == nil || compare(k, node.Key) == 0 {
+		return
+	}
+
+	switch compare(k, node.Key){
+	case 1:
+		if node.Right == nil {
+			node.addRightChild(k, v)
+		} else {
+			insert(node.Right, k, v, compare)
+		}
+	case -1:
+		if node.Left == nil {
+			node.addLeftChild(k, v )
+		} else {
+			insert(node.Left,k, v, compare)
+		}
+	default:
+		return
+	}
+
+}
+
 func NewBST() *BST {
 	return new(BST)
 }
@@ -95,18 +130,18 @@ func NewBST() *BST {
 //	return bst.size(n.Left) + 1 + bst.size(n.Right)
 //}
 
-func (bst *BST) Size() int {
-	return bst.size
-}
+//func (bst *BST) Size() int {
+//	return bst.Size
+//}
 
-func (bst *BST) Insert(data int) * BST {
+func (bst *BST) Insert(k , v interface{}) * BST {
 	if bst.Root == nil {
-		bst.Root = NewNode(data)
+		bst.Root = NewNode(k, v)
 
 	} else {
-		bst.Root.Insert(data)
+		insert(bst.Root, k, v, bst.compareFunc)
 	}
-	bst.size++
+	bst.Size++
 	return bst
 
 }
@@ -115,7 +150,7 @@ func (bst *BST) MaxDepth() int {
 	return maxDepth(bst.Root)
 }
 
-func (bst *BST) MinValue() int {
+func (bst *BST) MinKey() interface{} {
 	current := bst.Root
 	if current == nil {
 		return 0
@@ -123,10 +158,10 @@ func (bst *BST) MinValue() int {
 	for ; current.Left != nil;  {
 		current = current.Left
 	}
-	return current.Data
+	return current.Key
 }
 
-func (bst *BST) MaxValue() int {
+func (bst *BST) MaxKey() interface{} {
 	current := bst.Root
 	if current == nil {
 		return 0
@@ -134,15 +169,35 @@ func (bst *BST) MaxValue() int {
 	for ; current.Right != nil;  {
 		current = current.Right
 	}
-	return current.Data
+	return current.Key
+}
+
+func preOrderTraverse(n *Node, f TraverseFunc) {
+
+	f(n.Key, n.Value)
+	preOrderTraverse(n.Left, f)
+	preOrderTraverse(n.Right, f)
 }
 
 func (bst *BST) PrintPreOder() {
-	
+
+}
+
+func inOrderTraverse(n *Node, f TraverseFunc) {
+	preOrderTraverse(n.Left, f)
+	f(n.Key, n.Value)
+	preOrderTraverse(n.Right, f)
 }
 
 func (bst *BST) PrintInOder() {
 
+}
+
+func postOrderTraverse(n *Node, f TraverseFunc) {
+	
+	preOrderTraverse(n.Left, f)
+	f(n.Key, n.Value)
+	preOrderTraverse(n.Right, f)
 }
 
 func (bst *BST) PrintPostOder() {
