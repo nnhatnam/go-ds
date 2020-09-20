@@ -64,13 +64,17 @@ func (node *Node) hasLeftChild() bool {
 	return node.Left != nil
 }
 
+func (node *Node) hasNoChild() bool {
+	return !node.hasLeftChild() && !node.hasRightChild()
+}
+
 
 
 type BST struct {
 	Root *Node
 	Size int
 
-	compareFunc trees.CompareFunc
+	CompareFunc trees.CompareFunc
 }
 
 /*
@@ -139,7 +143,7 @@ func (bst *BST) Insert(k , v interface{}) * BST {
 		bst.Root = NewNode(k, v)
 
 	} else {
-		insert(bst.Root, k, v, bst.compareFunc)
+		insert(bst.Root, k, v, bst.CompareFunc)
 	}
 	bst.Size++
 	return bst
@@ -150,56 +154,208 @@ func (bst *BST) MaxDepth() int {
 	return maxDepth(bst.Root)
 }
 
-func (bst *BST) MinKey() interface{} {
-	current := bst.Root
+func findMin(n *Node) *Node {
+	current := n
 	if current == nil {
-		return 0
+		return nil
 	}
 	for ; current.Left != nil;  {
 		current = current.Left
 	}
-	return current.Key
+	return  current
 }
 
-func (bst *BST) MaxKey() interface{} {
-	current := bst.Root
+//return the value with min key stored in the tree
+func (bst *BST) Min() *Node {
+	if bst == nil {
+		return nil
+	}
+	return findMin(bst.Root)
+
+	//current := bst.Root
+	//if current == nil {
+	//	return 0
+	//}
+	//for ; current.Left != nil;  {
+	//	current = current.Left
+	//}
+
+}
+
+func findMax(n *Node) *Node {
+	current := n
 	if current == nil {
-		return 0
+		return nil
 	}
 	for ; current.Right != nil;  {
 		current = current.Right
 	}
-	return current.Key
+	return  current
+}
+
+func (bst *BST) Max() *Node {
+	if bst == nil {
+		return nil
+	}
+	return findMax(bst.Root)
+	//current := bst.Root
+	//if current == nil {
+	//	return 0
+	//}
+	//for ; current.Right != nil;  {
+	//	current = current.Right
+	//}
+	//return current.Key
 }
 
 func preOrderTraverse(n *Node, f TraverseFunc) {
-
+	if n == nil {
+		return
+	}
 	f(n.Key, n.Value)
 	preOrderTraverse(n.Left, f)
 	preOrderTraverse(n.Right, f)
+
 }
 
-func (bst *BST) PrintPreOder() {
+func (bst *BST) PreOderTraverse(f TraverseFunc) {
+	if bst != nil {
+		preOrderTraverse(bst.Root, f)
+	}
 
 }
 
 func inOrderTraverse(n *Node, f TraverseFunc) {
+	if n == nil {
+		return
+	}
 	preOrderTraverse(n.Left, f)
 	f(n.Key, n.Value)
 	preOrderTraverse(n.Right, f)
 }
 
-func (bst *BST) PrintInOder() {
-
+func (bst *BST) InOderTraverse(f TraverseFunc) {
+	if bst != nil {
+		inOrderTraverse(bst.Root, f)
+	}
 }
 
 func postOrderTraverse(n *Node, f TraverseFunc) {
-	
+	if n == nil {
+		return
+	}
 	preOrderTraverse(n.Left, f)
 	f(n.Key, n.Value)
 	preOrderTraverse(n.Right, f)
-}
-
-func (bst *BST) PrintPostOder() {
 
 }
+
+func (bst *BST) PostOderTraverse(f TraverseFunc) {
+	if bst != nil {
+		postOrderTraverse(bst.Root, f)
+	}
+}
+
+func search(n *Node, key interface{}, compareFunc trees.CompareFunc) *Node{
+	if n == nil || compareFunc(n.Key, key) == 0 {
+		return n
+	}
+
+	if compareFunc(n.Key, key) == -1 {
+		return search(n.Left, key, compareFunc)
+	}
+	return search(n.Right, key, compareFunc)
+}
+
+func (bst *BST) Search(key interface{}) *Node {
+	if bst == nil {
+		return nil
+	}
+
+	return search(bst.Root, key, bst.CompareFunc)
+}
+
+//Hibbard deletion algorithm
+//https://algs4.cs.princeton.edu/32bst/
+//optimize later
+func remove(root *Node, key interface{} , compareFunc trees.CompareFunc) interface{} {
+	if root == nil {
+		return nil
+	}
+	parent := root
+	curr := root
+
+	//compareResult := compareFunc(curr.Key, key)
+	for ; curr != nil && compareFunc(curr.Key, key) != 0 ;  {
+		parent = curr
+		if compareFunc(curr.Key, key) == 1 {
+			curr = curr.Left
+		} else {
+			curr = curr.Right
+		}
+	}
+
+	if curr == nil {
+		return nil
+	}
+
+	value := curr.Value
+	if curr.hasNoChild() { 				//Case 1: Node to be deleted has no subtree
+
+		if curr != root {
+			if parent.Left == curr {
+				parent.Left = nil
+			} else {
+				parent.Right = nil
+			}
+		} else {
+			root = nil
+		}
+
+	} else if curr.Left != nil && curr.Right != nil {	//Case 2: Node to be deleted has two children
+		successor := findMin(curr.Right)
+		curr.Key, curr.Value = successor.Key, successor.Value
+		return remove(successor, successor.Key, compareFunc)
+	} else {											//Case 3: node to be deleted has only one children
+		var child *Node
+		if curr.Left != nil {
+			child = curr.Left
+		} else {
+			child = curr.Right
+		}
+
+		if curr != root {
+			if parent.Left == curr {
+				parent.Left = child
+			} else {
+				parent.Right = child
+			}
+		} else {
+			root = child
+		}
+	}
+	return value
+	//Case 2: Node to be deleted only has one children
+
+
+	//node need to be deleted
+	//deleteNode := search(root, key, compareFunc)
+	//if deleteNode == nil {
+	//	return nil
+	//}
+
+	//Case 1: No has no subtree
+	//if deleteNode.hasNoChild() {
+	//	deleteNode = nil
+	//	return nil
+	//}
+
+}
+
+func (bst *BST) Remove(key interface{}) interface{}{
+	if bst == nil {
+		return nil
+	}
+	return remove(bst.Root, key, bst.CompareFunc)
+}
+
