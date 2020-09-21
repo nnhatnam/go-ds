@@ -356,6 +356,11 @@ func (bst *BST) Remove(key interface{}) interface{}{
 	if bst == nil {
 		return nil
 	}
-	return remove(bst.Root, key, bst.CompareFunc)
+
+	v := remove(bst.Root, key, bst.CompareFunc)
+	if v != nil {
+		bst.Size--
+	}
+	return v
 }
 
