@@ -1,4 +1,4 @@
-package trees
+package binarytree
 
 type CompareFunc func(a, b interface{}) int
 
@@ -13,4 +13,8 @@ func IntComparator(a, b interface{}) int {
 	default:
 		return 0
 	}
+}
+
+type ValueInterface interface {
+	Compare(other ValueInterface) int //-1 0 1
 }
