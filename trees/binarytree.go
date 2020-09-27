@@ -1,3 +1,3 @@
-package binarytree
+package trees
 
 type TraverseFunc func(interface{})

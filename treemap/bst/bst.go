@@ -1,6 +1,6 @@
 package bst
 
-import "github.com/nnhatnam/go-ds/binarytree"
+import "github.com/nnhatnam/go-ds/trees"
 
 type Node struct {
 	Left *Node
@@ -74,7 +74,7 @@ type BST struct {
 	Root *Node
 	Size int
 
-	CompareFunc binarytree.CompareFunc
+	CompareFunc trees.CompareFunc
 }
 
 /*
@@ -94,7 +94,7 @@ func maxDepth(node *Node) int {
 	return rDepth + 1
 }
 
-func insert(node *Node, k, v interface{}, compare binarytree.CompareFunc) {
+func insert(node *Node, k, v interface{}, compare trees.CompareFunc) {
 	if node == nil || compare(k, node.Key) == 0 {
 		return
 	}
@@ -256,7 +256,7 @@ func (bst *BST) PostOderTraverse(f TraverseFunc) {
 	}
 }
 
-func search(n *Node, key interface{}, compareFunc binarytree.CompareFunc) *Node{
+func search(n *Node, key interface{}, compareFunc trees.CompareFunc) *Node{
 	if n == nil || compareFunc(n.Key, key) == 0 {
 		return n
 	}
@@ -278,7 +278,7 @@ func (bst *BST) Search(key interface{}) *Node {
 //Hibbard deletion algorithm
 //https://algs4.cs.princeton.edu/32bst/
 //optimize later
-func remove(root *Node, key interface{} , compareFunc binarytree.CompareFunc) interface{} {
+func remove(root *Node, key interface{} , compareFunc trees.CompareFunc) interface{} {
 	if root == nil {
 		return nil
 	}

@@ -1,4 +1,4 @@
-package binarytree
+package trees
 
 type CompareFunc func(a, b interface{}) int
 
