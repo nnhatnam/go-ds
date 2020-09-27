@@ -16,29 +16,6 @@ func NewNode(k, v interface{}) *Node {
 }
 
 
-//func (node *Node) insert(k, v interface{}, compare trees.CompareFunc) {
-//	if node == nil || compare(k, node.Key) == 0 {
-//		return
-//	}
-//
-//	switch compare(k, node.Key){
-//	case 1:
-//		if node.Right == nil {
-//			node.addRightChild(k, v)
-//		} else {
-//			insert(node.Right, k, v, compare)
-//		}
-//	case -1:
-//		if node.Left == nil {
-//			node.addLeftChild(k, v )
-//		} else {
-//			insert(node.Left,k, v, compare)
-//		}
-//	default:
-//		return
-//	}
-//
-//}
 
 func (node *Node) addLeftChild(k, v interface{}) {
 	if node == nil {
@@ -229,9 +206,9 @@ func inOrderTraverse(n *Node, f TraverseFunc) {
 	if n == nil {
 		return
 	}
-	preOrderTraverse(n.Left, f)
+	inOrderTraverse(n.Left, f)
 	f(n.Key, n.Value)
-	preOrderTraverse(n.Right, f)
+	inOrderTraverse(n.Right, f)
 }
 
 func (bst *BST) InOderTraverse(f TraverseFunc) {
@@ -244,9 +221,9 @@ func postOrderTraverse(n *Node, f TraverseFunc) {
 	if n == nil {
 		return
 	}
-	preOrderTraverse(n.Left, f)
+	postOrderTraverse(n.Left, f)
 	f(n.Key, n.Value)
-	preOrderTraverse(n.Right, f)
+	postOrderTraverse(n.Right, f)
 
 }
 

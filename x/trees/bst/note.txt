@@ -1,0 +1,5 @@
+Node struct:
+
+    Value()
+    Left() -> return left child
+    Right() -> return right child
