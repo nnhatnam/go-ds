@@ -3,6 +3,7 @@
 http://matt.might.net/papers/germane2014deletion.pdf
 https://horstmann.com/unblog/2011-05-12/blog.html
 https://cs.lmu.edu/~ray/notes/redblacktrees/
+https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/
 
 Definition:
     Red-black tree is a binary search tree with the following additional properties:
@@ -28,17 +29,22 @@ Characteristic
 Important:
     - Proving the height of the Red-black tree is especially important because the height is what allow us to calcualte
     its asymptotic
+    - Duplicate key always go right
 
 Operations:
-    Insert
-        The algorithm has three steps:
-        Insert as you would into a BST, coloring the node red.
-        If the parent of the node you just inserted was red, you have a double-red problem which you must correct.
-        Color the root node black.
-        A double red problem is corrected with zero or more recolorings followed by zero or one restructuring.
-    Delete
+    Node:
+        Recolor / FlipColor
 
-    Search
+    Tree:
+        Insert
+            The algorithm has three steps:
+            Insert as you would into a BST, coloring the node red.
+            If the parent of the node you just inserted was red, you have a double-red problem which you must correct.
+            Color the root node black.
+            A double red problem is corrected with zero or more recolorings followed by zero or one restructuring.
+        Delete
+
+        Search
 
 
 

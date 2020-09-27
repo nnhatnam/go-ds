@@ -138,7 +138,7 @@ func NewBST() *BST {
 //	return bst.Size
 //}
 
-func (bst *BST) Insert(k , v interface{}) * BST {
+func (bst *BST) Insert(k , v interface{}) *BST {
 	if bst.Root == nil {
 		bst.Root = NewNode(k, v)
 
