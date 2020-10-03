@@ -3,3 +3,13 @@ Node struct:
     Value()
     Left() -> return left child
     Right() -> return right child
+
+Global operations:
+    MaxDepth
+    FindMax
+    FindMin
+    PreOrderTraverse
+    InOrderTraverse
+    PostOrderTraverse
+    Insert
+    Delete
