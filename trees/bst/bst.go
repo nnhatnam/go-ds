@@ -1,36 +1,15 @@
 package bst
 
-import "github.com/nnhatnam/go-ds/trees"
-
 type Node struct {
-	Left *Node
+	Left  *Node
 	Right *Node
-	Key interface{}
-	Value interface{}
+	Value Interface
 }
 
-type TraverseFunc func(interface{}, interface{})
-
-func NewNode(k, v interface{}) *Node {
-	return &Node{Key: k, Value:v,}
-}
-
-
-
-func (node *Node) addLeftChild(k, v interface{}) {
-	if node == nil {
-		return
+func NewNode(v Interface) *Node {
+	return &Node{
+		Value: v,
 	}
-
-	node.Left = &Node{Key: k, Value: v,}
-}
-
-func (node *Node) addRightChild(k, v interface{}) {
-	if node == nil {
-		return
-	}
-
-	node.Right = &Node{Key: k, Value: v,}
 }
 
 func (node *Node) hasRightChild() bool {
@@ -46,12 +25,11 @@ func (node *Node) hasNoChild() bool {
 }
 
 
-
-type BST struct {
-	Root *Node
-	Size int
-
-	CompareFunc trees.CompareFunc
+type Tree struct {
+	//root node is dummy node, the actual root is root.Left
+	root *Node
+	//caching size of tree
+	size int
 }
 
 /*
@@ -71,39 +49,28 @@ func maxDepth(node *Node) int {
 	return rDepth + 1
 }
 
-func insert(node *Node, k, v interface{}, compare trees.CompareFunc) {
-	if node == nil || compare(k, node.Key) == 0 {
-		return
-	}
 
-	switch compare(k, node.Key){
-	case 1:
-		if node.Right == nil {
-			node.addRightChild(k, v)
-		} else {
-			insert(node.Right, k, v, compare)
-		}
-	case -1:
-		if node.Left == nil {
-			node.addLeftChild(k, v )
-		} else {
-			insert(node.Left,k, v, compare)
-		}
-	default:
-		return
-	}
-
+func NewTree() *Tree {
+	return new(Tree).Init()
 }
 
-func NewBST() *BST {
-	return new(BST)
+func (bst *Tree) Init() *Tree{
+	bst.root = NewNode(nil)
+	bst.size = 0
+	return bst
 }
 
-//func (bst *BST) Root() * Node {
-//	return bst.Root
-//}
+func (bst *Tree) lazyInit() {
+	if bst.root == nil {
+		bst.Init()
+	}
+}
 
-//func (bst *BST) size(n *Node ) int {
+func (bst *Tree) Root() *Node {
+	return bst.root.Left
+}
+
+//func (bst *Tree) size(n *Node ) int {
 //	if n == nil {
 //		return 0
 //	}
@@ -111,93 +78,116 @@ func NewBST() *BST {
 //	return bst.size(n.Left) + 1 + bst.size(n.Right)
 //}
 
-//func (bst *BST) Size() int {
+//func (bst *Tree) Size() int {
 //	return bst.Size
 //}
 
-func (bst *BST) Insert(k , v interface{}) *BST {
-	if bst.Root == nil {
-		bst.Root = NewNode(k, v)
+//Insert value v into the tree, v must be not nil
+func (bst *Tree) Insert(v Interface) *Tree {
+	bst.lazyInit()
 
-	} else {
-		insert(bst.Root, k, v, bst.CompareFunc)
+	if v == nil {
+		return nil
 	}
-	bst.Size++
+
+	bst.size++
+	if bst.root.Left == nil {
+		bst.root.Left = NewNode(v)
+		return bst
+	}
+
+	insert(bst.root.Left, v)
+
+
 	return bst
 
 }
 
-func (bst *BST) MaxDepth() int {
-	return maxDepth(bst.Root)
+//insert a node node into a tree. if there is node that has value equal to v. v will be added to the right child
+//v must be not nil
+func insert(node *Node, v Interface) {
+	//if node is nil, nothing happens
+	if node == nil {
+		return
+	}
+
+	switch v.Compare(node.Value){
+	//if v >= node.Value then go right
+	case 0, 1:
+		if node.Right == nil {
+			node.Right = NewNode(v)
+		} else {
+			insert(node.Right, v)
+		}
+	//	if v < node.Value, then go left
+	case -1:
+		if node.Left == nil {
+			node.Left = NewNode(v)
+		} else {
+			insert(node.Left, v)
+		}
+	default:
+		return
+	}
 }
 
-func findMin(n *Node) *Node {
-	current := n
-	if current == nil {
-		return nil
+
+func (bst *Tree) MaxDepth() int {
+	return maxDepth(bst.Root())
+}
+
+//find min from a node, return the node and its parent. If n is the min node, parent will be nil
+//n must be not nil
+func findMin(n *Node) (parent *Node, node *Node) {
+	parent = nil
+	node = n
+	for ; node.Left != nil; node = node.Left {
+		parent = node
 	}
-	for ; current.Left != nil;  {
-		current = current.Left
-	}
-	return  current
+	return
 }
 
 //return the value with min key stored in the tree
-func (bst *BST) Min() *Node {
+func (bst *Tree) Min() *Node {
 	if bst == nil {
 		return nil
 	}
-	return findMin(bst.Root)
-
-	//current := bst.Root
-	//if current == nil {
-	//	return 0
-	//}
-	//for ; current.Left != nil;  {
-	//	current = current.Left
-	//}
-
+	_, n := findMin(bst.Root())
+	return n
 }
 
-func findMax(n *Node) *Node {
-	current := n
-	if current == nil {
-		return nil
+//find max from a node, return the node and its parent. If n is the max node, parent will be nil
+//n must be not nil
+func findMax(n *Node)  (parent *Node, node *Node)  {
+	parent = nil
+	node = n
+	for ; node.Right != nil; node = node.Right {
+		parent = node
 	}
-	for ; current.Right != nil;  {
-		current = current.Right
-	}
-	return  current
+	return
 }
 
-func (bst *BST) Max() *Node {
+func (bst *Tree) Max() *Node {
 	if bst == nil {
 		return nil
 	}
-	return findMax(bst.Root)
-	//current := bst.Root
-	//if current == nil {
-	//	return 0
-	//}
-	//for ; current.Right != nil;  {
-	//	current = current.Right
-	//}
-	//return current.Key
+	_, n := findMax(bst.Root())
+	return n
 }
 
 func preOrderTraverse(n *Node, f TraverseFunc) {
 	if n == nil {
 		return
 	}
-	f(n.Key, n.Value)
+	f(n.Value)
 	preOrderTraverse(n.Left, f)
 	preOrderTraverse(n.Right, f)
 
 }
 
-func (bst *BST) PreOderTraverse(f TraverseFunc) {
+func (bst *Tree) PreOderTraverse(f TraverseFunc) {
 	if bst != nil {
-		preOrderTraverse(bst.Root, f)
+		preOrderTraverse(bst.Root(), f)
 	}
 
 }
@@ -207,13 +197,13 @@ func inOrderTraverse(n *Node, f TraverseFunc) {
 		return
 	}
 	inOrderTraverse(n.Left, f)
-	f(n.Key, n.Value)
+	f(n.Value)
 	inOrderTraverse(n.Right, f)
 }
 
-func (bst *BST) InOderTraverse(f TraverseFunc) {
+func (bst *Tree) InOderTraverse(f TraverseFunc) {
 	if bst != nil {
-		inOrderTraverse(bst.Root, f)
+		inOrderTraverse(bst.Root(), f)
 	}
 }
 
@@ -221,97 +211,102 @@ func postOrderTraverse(n *Node, f TraverseFunc) {
 	if n == nil {
 		return
 	}
-	postOrderTraverse(n.Left, f)
-	f(n.Key, n.Value)
-	postOrderTraverse(n.Right, f)
+	preOrderTraverse(n.Left, f)
+	f(n.Value)
+	preOrderTraverse(n.Right, f)
 
 }
 
-func (bst *BST) PostOderTraverse(f TraverseFunc) {
+func (bst *Tree) PostOderTraverse(f TraverseFunc) {
 	if bst != nil {
-		postOrderTraverse(bst.Root, f)
+		postOrderTraverse(bst.Root(), f)
 	}
 }
 
-func search(n *Node, key interface{}, compareFunc trees.CompareFunc) *Node{
-	if n == nil || compareFunc(n.Key, key) == 0 {
-		return n
+//v, n must not be nil
+func search(n *Node, v Interface) (parent, node *Node) {
+	for ; n != nil && v.Compare(n.Value) != 0 ; {
+		parent = n
+		if v.Compare(n.Value) == -1 {
+			n = n.Left
+		} else {
+			n = n.Right
+		}
 	}
 
-	if compareFunc(n.Key, key) == -1 {
-		return search(n.Left, key, compareFunc)
-	}
-	return search(n.Right, key, compareFunc)
+	return parent, n
 }
 
-func (bst *BST) Search(key interface{}) *Node {
+func (bst *Tree) Search(v Interface) *Node {
 	if bst == nil {
 		return nil
 	}
-
-	return search(bst.Root, key, bst.CompareFunc)
+	_ , n := search(bst.root, v)
+	return n
 }
+
+func (bst *Tree) Remove(v Interface) *Node {
+	if bst == nil || v == nil {
+		return nil
+	}
+	if v.Compare(bst.Root().Value) == 0 {
+		bst.size--
+		return bst.removeHibbard(bst.root, bst.Root())
+	}
+	bst.size--
+	return bst.removeHibbard(search(bst.Root(), v))
+	//return removedNode
+}
+
+
 
 //Hibbard deletion algorithm
 //https://algs4.cs.princeton.edu/32bst/
-//optimize later
-func remove(root *Node, key interface{} , compareFunc trees.CompareFunc) interface{} {
-	if root == nil {
+//remove deletedNode from its parent using Hibbard delete algorithm. if deletedNode is the root. parent would be the dummy node
+//remove can't remove parent node due to Go doesn't support pass by reference
+//return the new node that take place of deleted node
+//remove don't handle size of the tree
+func (bst *Tree) removeHibbard(parent *Node, deletedNode *Node) *Node {
+	if parent == nil || deletedNode == nil {
 		return nil
 	}
-	parent := root
-	curr := root
-
-	//compareResult := compareFunc(curr.Key, key)
-	for ; curr != nil && compareFunc(curr.Key, key) != 0 ;  {
-		parent = curr
-		if compareFunc(curr.Key, key) == 1 {
-			curr = curr.Left
+	//value := deletedNode.Value
+	if deletedNode.hasNoChild() {
+		//Case 1: Node to be deleted has zero children
+		//What we need to do is set node to nil
+		//Because we use dummy root node mechanism, current != dummy root
+		if parent.Left == deletedNode {
+			parent.Left = nil
 		} else {
-			curr = curr.Right
+			parent.Right = nil
 		}
-	}
-
-	if curr == nil {
-		return nil
-	}
-
-	value := curr.Value
-	if curr.hasNoChild() { 				//Case 1: Node to be deleted has no subtree
-
-		if curr != root {
-			if parent.Left == curr {
-				parent.Left = nil
-			} else {
-				parent.Right = nil
-			}
-		} else {
-			root = nil
-		}
-
-	} else if curr.Left != nil && curr.Right != nil {	//Case 2: Node to be deleted has two children
-		successor := findMin(curr.Right)
-		curr.Key, curr.Value = successor.Key, successor.Value
-		return remove(successor, successor.Key, compareFunc)
-	} else {											//Case 3: node to be deleted has only one children
+		return deletedNode
+	} else if deletedNode.Left != nil && deletedNode.Right != nil {
+		//Case 2: Node to be deleted has two children
+		//Find minimum element in the right subtree of the node to be removed
+		s_parent , successor := findMin(deletedNode.Right)
+		deletedNode.Value = successor.Value
+		bst.removeHibbard(s_parent, successor)
+		return deletedNode
+	} else {
+		//Case 3: node to be deleted has only one children
 		var child *Node
-		if curr.Left != nil {
-			child = curr.Left
+		if deletedNode.Left != nil {
+			child = deletedNode.Left
+			deletedNode.Left = nil
 		} else {
-			child = curr.Right
+			child = deletedNode.Right
+			deletedNode.Right = nil
 		}
 
-		if curr != root {
-			if parent.Left == curr {
-				parent.Left = child
-			} else {
-				parent.Right = child
-			}
+		if parent.Left == deletedNode {
+			parent.Left = child
 		} else {
-			root = child
+			parent.Right = child
 		}
+
+		return child
 	}
-	return value
 	//Case 2: Node to be deleted only has one children
 
 
@@ -327,17 +322,5 @@ func remove(root *Node, key interface{} , compareFunc trees.CompareFunc) interfa
 	//	return nil
 	//}
 
-}
-
-func (bst *BST) Remove(key interface{}) interface{}{
-	if bst == nil {
-		return nil
-	}
-
-	v := remove(bst.Root, key, bst.CompareFunc)
-	if v != nil {
-		bst.Size--
-	}
-	return v
 }
 

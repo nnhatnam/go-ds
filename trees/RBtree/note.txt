@@ -4,13 +4,14 @@ http://matt.might.net/papers/germane2014deletion.pdf
 https://horstmann.com/unblog/2011-05-12/blog.html
 https://cs.lmu.edu/~ray/notes/redblacktrees/
 https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/
+https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/11-Redblack.pdf
 
 Definition:
     Red-black tree is a binary search tree with the following additional properties:
         1. Every node is colored red or black
-        2. The root is always black
+        2. The root is always black (root rule)
         3. All leaves are null and they are black
-        4. No double reds rule: A red node cannot have a red child
+        4. No double reds rule: A red node cannot have a red child. If a node is red, then both its children are black (red rule)
         5. Any path from a given node to any of its descendant leaves contains the same amount of black nodes. This is
         sometimes known as the black-depth if the given node is the root
 
