@@ -1,4 +1,4 @@
-package RBtree
+package rbtree
 
 type Node struct {
 	Key int
