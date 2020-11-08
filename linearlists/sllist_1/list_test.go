@@ -1,4 +1,4 @@
-package sllist
+package sllist_1
 
 import (
 	"fmt"

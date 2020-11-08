@@ -1,4 +1,4 @@
-package sllist
+package sllist_1
 
 // Node is a node of a linked list.
 type Node struct {
@@ -25,30 +25,29 @@ type sentinel struct {
 
 
 type List struct {
-	head *Node
-	tail *Node
+	//head *Node // sentinel list element, only &root, root.prev, and root.next are used
+
 	root sentinel
 	length int //  current list length excluding (this) sentinel element
 }
 
 // Init initializes or clears list l.
-func (l *List) Init() *List {
-	node := &Node{Value: nil}
-	l.head = node
-	l.tail = node
+func (l *List) init() *List {
+	l.root.head = nil
+	l.root.tail = nil
 	l.length = 0
 	return l
 }
 
 // lazyInit lazily initializes a zero List value.
 func (l *List) lazyInit() {
-	if l.head == nil {
-		l.Init()
+	if l.root.head == nil {
+		l.init()
 	}
 }
 
 func New(values ...interface{}) *List{
-	list := new(List).Init()
+	list := (&List{})
 	if len(values) > 0 {
 		list.appendMany(values...)
 	}
