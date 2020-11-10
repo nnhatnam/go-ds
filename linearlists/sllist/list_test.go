@@ -16,6 +16,9 @@ type TestStruct struct {
 func printValues(l *List) {
 	values := make([]interface{}, l.length)
 
+	for it := l.Iterator(); !it.End(); it.Next()
+
+	}
 	l.Traverse(func(n *Element, i int){
 		values[i] =  n.Value
 	})

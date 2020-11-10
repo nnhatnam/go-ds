@@ -1,56 +1,34 @@
 package sllist
 
-type Iterator struct {
 
-	*element
 
+// Element is a node of a linked list.
+type Element struct {
+
+	next *Element
+
+	// The list to which this Element belongs.
 	list *List
-
-}
-
-func (iter *Iterator) Next() bool {
-	if iter.element == nil {
-		return false
-	}
-	iter.element = iter.element.next
-	return true
-}
-
-func (iter *Iterator) Value() interface{} {
-
-	if iter.element == nil {
-		return nil
-	}
-	return iter.element.value
-}
-
-// element is a node of a linked list.
-type element struct {
-
-	next *element
-
-	// The list to which this element belongs.
-	//list *List
 
 	//The value stored with this node
 	value interface{}
 }
 
-//func (n *element) Next() *element {
-//	return n.next
-//}
+func (n *Element) Next() *Element {
+	return n.next
+}
 
 type List struct {
-	head *element
-	tail *element
+	head *Element
+	tail *Element
 	//root sentinel
-	length int //  current list length excluding (this) sentinel element
+	length int //  current list length excluding (this) sentinel Element
 }
 
 // Init initializes or clears list l.
 func (l *List) Init() *List {
 	//this linked list use dummy node technical
-	node := &element{value: nil}
+	node := &Element{list: l, value: nil}
 	l.head = node
 	l.tail = node
 	l.length = 0
@@ -68,18 +46,52 @@ func New() *List{
 	return new(List).Init()
 }
 
+//return the real head of list l
+func (l *List) listHead() *Element {
+	return l.head.next
+}
+
+//return the tail of list l
+func (l *List) listTail() *Element {
+	return l.tail
+}
+
 func (l *List) append(value interface{})  {
 	if l.head == nil {
 		l.lazyInit()
 	}
-	l.tail.next = &element{value:value}
+	l.tail.next = &Element{list: l, value:value}
+	l.tail = l.tail.next
 	l.length += 1
 
 }
 
+func (l *List) appendMany(values ...interface{}) *Element {
+	if l.head == nil {
+		l.lazyInit()
+	}
 
-func (l *List) prepend(value interface{}) *element {
-	node := &element{
+	var elem *Element
+	for _, v := range values {
+		l.tail.next = &Element{list: l, value:v}
+		l.tail = l.tail.next
+		l.length += 1
+		if elem == nil {
+			elem = l.tail
+		}
+	}
+	return elem
+}
+
+
+
+func (l *List) prepend(value interface{}) *Element {
+
+	if l.head == nil {
+		l.lazyInit()
+	}
+	node := &Element{
+		list: l,
 		next:l.head.next,
 		value:value,
 	}
@@ -88,12 +100,36 @@ func (l *List) prepend(value interface{}) *element {
 	return node
 }
 
-//Len returns the number of elements of list l. The complexity is O(1).
+func (l *List) prependMany(values ...interface{}) *Element {
+	if l.head == nil {
+		l.lazyInit()
+	}
+
+	for _ , v := range values {
+		l.head.next = &Element{
+			list: l,
+			next:l.head.next,
+			value:v,
+		}
+		l.length++
+	}
+	return l.head.next
+}
+
+//Len returns the number of Elements of list l. The complexity is O(1).
 func (l *List) Len() int { return l.length }
 
 //First returns the first value of list l or nil if l is empty. The complexity is O(1)
 func (l *List) First() interface{} {
-	return l.head.next.value
+	if l.length > 0 {
+		return l.head.next.value
+	}
+	return nil
+}
+
+//FirstElement returns the first element of list l or nil if l is empty. The complexity is O(1)
+func (l *List) FirstElement() *Element {
+	return l.head.next
 }
 
 //Last returns the last value of list l or nil if l is empty. The complexity is O(1)
@@ -104,17 +140,32 @@ func (l *List) Last() interface{} {
 	return nil
 }
 
-//PushFront inserts a new element with value v at the beginning of list l. The complexity is O(1)
+func (l *List) LastElement() *Element {
+	if l.length > 0 {
+		return l.tail
+	}
+	return nil
+}
+
+func (l *List) Append(values ...interface{}) *Element {
+	return l.appendMany(values)
+}
+
+func (l *List) Prepend(values ...interface{}) *Element {
+	return l.prependMany(values)
+}
+
+//PushFront inserts a new Element with value v at the beginning of list l. The complexity is O(1)
 func (l *List) PushFront(v interface{}) {
 	l.prepend(v)
 }
 
-//Push inserts a new element with value v at the end of list l. The complexity is O(1)
+//Push inserts a new Element with value v at the end of list l. The complexity is O(1)
 func (l *List) PushBack(v interface{})  {
 	l.append(v)
 }
 
-//Pop removes the last element from list l and returns that element. The complexity is O(n)
+//Pop removes the last Element from list l and returns that Element. The complexity is O(n)
 func (l *List) PopBack() interface{} {
 	if l.length > 0 {
 		if e := l.remove(l.tail); e != nil {
@@ -125,7 +176,7 @@ func (l *List) PopBack() interface{} {
 	return nil
 }
 
-//Pop removes the first element from list l and returns that element. The complexity is O(n)
+//Pop removes the first Element from list l and returns that Element. The complexity is O(n)
 func (l *List) PopFront() interface{} {
 	if l.length > 0 {
 		if e := l.remove(l.head.next); e != nil {
@@ -136,17 +187,18 @@ func (l *List) PopFront() interface{} {
 	return nil
 }
 
-// remove removes the element e from list l (if e belong to the list), decrements l.len, and returns e. The complexity is O(n)
-func (l *List) remove(e *element) *element {
+// remove removes the Element e from list l (if e belong to the list), decrements l.len, and returns e. The complexity is O(n)
+func (l *List) remove(e *Element) *Element {
 
 	for el := l.head; el != nil; el = el.next {
 		if el.next == e {
-			//el is previous element of e
+			//el is previous Element of e
 			el.next = e.next
 			if l.tail == e {
 				l.tail = el
 			}
 			e.next = nil
+			e.list = nil
 			l.length--
 			return e
 		}
@@ -155,31 +207,25 @@ func (l *List) remove(e *element) *element {
 	return nil
 }
 
-//Iterator return an iterator pointing to the first element
-func (l *List) Iterator() Iterator {
-	return Iterator{
-		element: l.head.next,
-		list:    l,
+
+
+type IterateFunc func(e *Element, position int)
+
+
+func (l *List) Traverse(f IterateFunc){
+
+	var i = 0
+	for elem := l.head.next; elem != nil; elem = elem.next {
+		f(elem, i)
+		i++
 	}
+
 }
 
 
+type lookupFunc func(e *Element) bool //private find by node (index doesn't need, because we can access it in private level)
 
-type IterateFunc func(e *element, position int)
-
-//
-//func (l *List) Traverse(f IterateFunc){
-//	var i = 0
-//	for node := l.First(); node != nil; node = node.Next() {
-//		f(node,i)
-//		i++
-//	}
-//}
-
-
-type lookupFunc func(e *element) bool //private find by node (index doesn't need, because we can access it in private level)
-
-func (l *List) lookup(f lookupFunc) *element {
+func (l *List) lookup(f lookupFunc) *Element {
 
 	//loop from dummy node
 	for e := l.head; e != nil; e = e.next {
@@ -195,9 +241,11 @@ func (l *List) lookup(f lookupFunc) *element {
 
 
 
-//insert an element e after the element at, increments l.len, and return n, update tail if needed. element at must not be nil
-func (l *List) insert(e, at *element) *element {
-
+//insert an Element e after the Element at, increments l.len, and return n, update tail if needed. Element at must not be nil
+func (l *List) insert(e, at *Element) *Element {
+	if e.list != at.list {
+		return nil
+	}
 	if l.tail == at {
 		l.tail = e
 	}
@@ -208,47 +256,41 @@ func (l *List) insert(e, at *element) *element {
 	return e
 }
 
-// insertValue is a convenience wrapper for insert(&element{Value: v}, at).
-func (l *List) insertValue(v interface{}, at *element) *element {
-	return l.insert(&element{value:v,}, at)
+// insertValue is a convenience wrapper for insert(&Element{Value: v}, at).
+func (l *List) insertValue(v interface{}, at *Element) *Element {
+	return l.insert(&Element{value:v,}, at)
 }
 
-// InsertAfter inserts a new element e with value v immediately after an element that mark iterator pointing in and returns the value.
-// If mark is not an element of l, the list is not modified.
+// InsertAfter inserts a new Element e with value v immediately after an Element that mark iterator pointing in and returns the value.
+// If mark is not an Element of l, the list is not modified.
 // The mark must not be nil.
-func (l *List) InsertAfter(iter *Iterator, values ...interface{}) {
+func (l *List) InsertAfter(v interface{}, mark *Element) *Element {
 
-	if iter.list != l {
-		return
+	if mark.list != l {
+		return nil
 	}
 
-	elem := iter.element
-
-	for _, v := range values {
-		elem = l.insert(&element{value:v,}, elem)
-	}
+	return l.insertValue(v, mark)
 }
 
 
 //Note later
-func (l *List) InsertBefore(iter *Iterator , values ...interface{}) {
-	if iter.list != l {
-		return
+func (l *List) InsertBefore(v interface{}, mark *Element) *Element {
+
+	if mark.list != l {
+		return nil
 	}
 
-	// Find node before iter.element
-	elem := l.lookup(func(n *element) bool {
-		return n.next == iter.element
+	// Find node before iter.Element
+	elem := l.lookup(func(n *Element) bool {
+		return n.next == mark
 	})
 
-	for _, v := range values {
-		elem = l.insert(&element{value:v,}, elem)
-	}
-
+	return l.insertValue(v, elem)
 }
 
 //move node n after node at
-func (l *List) move(n, at *element) *element {
+func (l *List) move(n, at *Element) *Element {
 
 	if n == at || at.next == n {
 		return n
@@ -258,7 +300,7 @@ func (l *List) move(n, at *element) *element {
 		l.head.next = n.next
 
 	} else {
-		nodeBeforeN := l.lookup(func(node *element) bool {
+		nodeBeforeN := l.lookup(func(node *Element) bool {
 			return node.next == n
 		})
 		nodeBeforeN.next = n.next
@@ -276,55 +318,55 @@ func (l *List) move(n, at *element) *element {
 }
 
 //need to re-implement
-func (l *List) MoveAfter(iter, mark *Iterator) {
-	if iter.list != l || iter.element == mark.element || mark.list != l {
+func (l *List) MoveAfter(e, mark *Element) {
+	if e.list != l || e == mark || mark.list != l {
 		return
 	}
-	l.move(iter.element, mark.element)
+	l.move(e, mark)
 }
 
 // MoveBefore moves node n to its new position before mark.
 // If n or mark is not an node of l, or n == mark, the list is not modified.
 // The node and mark must not be nil.
-func (l *List) MoveBefore(iter, mark *Iterator){
-	if iter.list != l || iter.element == mark.element || mark.list != l || iter.element.next == mark.element {
+func (l *List) MoveBefore(e, mark *Element){
+	if e.list != l || e == mark || mark.list != l {
 		return
 	}
-	nodeBeforeMark := l.lookup(func(n *element) bool {
-		return n.next == mark.element
+
+	nodeBeforeMark := l.lookup(func(n *Element) bool {
+		return n.next == mark
 	})
 
-	l.move(iter.element, nodeBeforeMark)
-
+	l.move(e, nodeBeforeMark)
 }
 
 //need implement
-func (l *List) MoveToBack(iter *Iterator) {
-	if iter.list != l || l.tail == iter.element || iter.element == nil  {
+func (l *List) MoveToBack(e *Element) {
+	if e.list != l || l.tail == e {
 		return
 	}
-	l.move(iter.element, l.tail)
+	l.move(e, l.tail)
 }
 
 //need implement
-func (l *List) MoveToFront(iter *Iterator){
+func (l *List) MoveToFront(e *Element){
 
-	elem := iter.element
-	if iter.list != l || l.head.next == elem || elem == nil {
+
+	if e.list != l || l.head.next == e {
 		return
 	}
 
-	prev := l.lookup(func(node *element) bool {
-		return node.next == elem
+	prev := l.lookup(func(node *Element) bool {
+		return node.next == e
 	})
 
-	prev.next = elem.next
-	elem.next = l.head.next
+	prev.next = e.next
+	e.next = l.head.next
 
-	if elem == l.tail {
+	if e == l.tail {
 		l.tail = prev
 	}
-	l.head = elem
+	l.head = e
 }
 
 
@@ -364,15 +406,15 @@ func (l *List) PushFrontList(other *List){
 
 
 //need implement
-func (l *List) Remove(n *Iterator) interface{}{
-	if n.list == l {
-		l.remove(n.element)
+func (l *List) Remove(e *Element) interface{}{
+	if e.list == l {
+		l.remove(e)
 	}
 
-	return n.Value
+	return e.value
 }
 
-//Removes all the elements from this list.
+//Removes all the Elements from this list.
 func (l *List) Clear() {
 	l.Init()
 }
