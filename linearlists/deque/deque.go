@@ -18,6 +18,7 @@ type (
 
 func newList() *list { return new(list).Init()}
 
+
 //Init initializes or clears list l.
 func (l *list) Init() *list {
 	l.head = nil
