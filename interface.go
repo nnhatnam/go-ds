@@ -1,4 +1,4 @@
-package types
+package hydrogen
 
 // A type that satisfies types.Comparator can be compared with other types.Comparator using the Compare method
 type Comparator interface {
