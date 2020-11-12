@@ -17,11 +17,14 @@ type nodes struct {
 	next []*Element
 }
 
+
 type Element struct {
 
-	value types.Comparator
+	key types.Comparator
+	value interface{}
 
 	list *SkipList
+
 
 	next []*Element
 	prev []*Element
@@ -41,7 +44,7 @@ func (e *Element) Next() *Element {
 
 //need to re-order
 type SkipList struct {
-
+	
 	root *Element
 
 	maxLevel int
@@ -53,6 +56,7 @@ type SkipList struct {
 
 }
 
+
 func NewWithConfig(maxLevel int, prob float64) *SkipList {
 
 	if maxLevel < 1 || maxLevel > 64 {
@@ -60,8 +64,13 @@ func NewWithConfig(maxLevel int, prob float64) *SkipList {
 	}
 
 	source := rand.NewSource(time.Now().UnixNano())
-
+	rootElement := Element{
+		key:   nil,
+		value: nil,
+		next:  make([]*Element, maxLevel),
+	}
 	return &SkipList{
+		root : &rootElement,
 		length:   0,
 		prob: prob,
 		maxLevel: maxLevel,
@@ -74,21 +83,103 @@ func New() *SkipList {
 	return NewWithConfig(DefaultMaxLevel, DefaultProb)
 }
 
-func (list *SkipList) generateLevel() int {
+func (l *SkipList) pickHeight() int {
 
-	if list.maxLevel <= 1 {
+	if l.maxLevel <= 1 {
 		return 1
 	}
 	level := 0
 
-	var x uint64 = rand.Uint64() & ((1 << uint(list.maxLevel-1)) - 1)
+	var x uint64 = rand.Uint64() & ((1 << uint(l.maxLevel-1)) - 1)
 	zeroes := bits.TrailingZeros64(x)
-	if zeroes <= list.maxLevel {
+	if zeroes <= l.maxLevel {
 		level = zeroes
 	}
 	return level
 }
 
-func (list *SkipList) Insert(value types.Comparator) {
+func (l *SkipList) Insert(key types.Comparator, value interface{}) {
 
+	height := l.pickHeight()
+	prevCache := make([]*Element, height - 1)
+	cur := l.root
+	l.length++
+	for r := l.maxLevel - 1; r >= 0; r-- {
+
+		for cur.next[r] != nil && cur.next[r].key.Cmp(key) < 0 {
+			cur = cur.next[r]
+		}
+
+		if r <= height {
+			prevCache[r] = cur
+		}
+	}
+
+	if cur.key.Cmp(key) == 0 {
+		cur.value = value
+	}
+
+	el := &Element{
+		key:   key,
+		value: value,
+
+		next:  make([]*Element, height),
+		prev:  make([]*Element, height),
+	}
+
+	for row, pointer := range prevCache {
+		el.next[row] = pointer.next[row]
+		el.prev[row] = pointer
+		pointer.next[row].prev[row] = el
+		pointer.next[row] = el
+	}
+
+}
+
+func (l *SkipList) Size() int {
+	return l.length
+}
+
+func (l *SkipList) IsEmpty() bool {
+	return l.length == 0
+}
+
+func (l *SkipList) Find(key types.Comparator) interface{} {
+	cur := l.root
+	for r := l.maxLevel - 1; r >= 0; r-- {
+
+		for cur.next[r] != nil && cur.next[r].key.Cmp(key) < 0 {
+			cur = cur.next[r]
+		}
+
+	}
+	if cur.key.Cmp(key) == 0 {
+		return cur.value
+	}
+	return nil
+}
+
+func (l *SkipList) Remove(key types.Comparator) bool {
+	cur := l.root
+	for r := l.maxLevel - 1; r >= 0; r-- {
+
+		for cur.next[r] != nil && cur.next[r].key.Cmp(key) < 0 {
+			cur = cur.next[r]
+		}
+
+	}
+	if cur.key.Cmp(key) == 0 {
+
+		for row, nextElem := range cur.next {
+			nextElem.prev[row] = cur.prev[row]
+			cur.prev[row].next[row] = nextElem
+			cur.prev[row] = nil
+			cur.next[row] = nil
+		}
+
+		cur.list = nil
+
+		return true
+	}
+	return false
 }
