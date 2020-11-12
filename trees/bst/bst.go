@@ -258,8 +258,6 @@ func (bst *Tree) Remove(v Interface) *Node {
 	//return removedNode
 }
 
-
-
 //Hibbard deletion algorithm
 //https://algs4.cs.princeton.edu/32bst/
 //remove deletedNode from its parent using Hibbard delete algorithm. if deletedNode is the root. parent would be the dummy node
