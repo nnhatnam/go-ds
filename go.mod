@@ -1,4 +1,4 @@
-module github.com/nnhatnam/go-ds
+module github.com/nnhatnam/hydrogen
 
 go 1.15
 
