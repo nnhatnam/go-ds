@@ -99,7 +99,6 @@ func (l *SkipList) pickHeight() int {
 }
 
 func (l *SkipList) Insert(key hydrogen.Comparator, value interface{}) {
-
 	height := l.pickHeight()
 	prevCache := make([]*Element, height - 1)
 	cur := l.root
