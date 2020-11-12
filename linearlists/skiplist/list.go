@@ -1,7 +1,7 @@
 package skiplist
 
 import (
-	"github.com/nnhatnam/go-ds/types"
+	"github.com/nnhatnam/go-ds"
 	"math"
 	"math/bits"
 	"math/rand"
@@ -20,7 +20,7 @@ type nodes struct {
 
 type Element struct {
 
-	key types.Comparator
+	key   go_ds.Comparator
 	value interface{}
 
 	list *SkipList
@@ -98,7 +98,7 @@ func (l *SkipList) pickHeight() int {
 	return level
 }
 
-func (l *SkipList) Insert(key types.Comparator, value interface{}) {
+func (l *SkipList) Insert(key go_ds.Comparator, value interface{}) {
 
 	height := l.pickHeight()
 	prevCache := make([]*Element, height - 1)
@@ -144,7 +144,7 @@ func (l *SkipList) IsEmpty() bool {
 	return l.length == 0
 }
 
-func (l *SkipList) Find(key types.Comparator) interface{} {
+func (l *SkipList) Find(key go_ds.Comparator) interface{} {
 	cur := l.root
 	for r := l.maxLevel - 1; r >= 0; r-- {
 
@@ -159,7 +159,7 @@ func (l *SkipList) Find(key types.Comparator) interface{} {
 	return nil
 }
 
-func (l *SkipList) Remove(key types.Comparator) bool {
+func (l *SkipList) Remove(key go_ds.Comparator) bool {
 	cur := l.root
 	for r := l.maxLevel - 1; r >= 0; r-- {
 
