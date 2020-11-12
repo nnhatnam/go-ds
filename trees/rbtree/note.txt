@@ -1,0 +1,52 @@
+1. The local property that every red node has two black children
+2. The global property that every path from the root to a leaf node contains the same number of black nodes
+http://matt.might.net/papers/germane2014deletion.pdf
+https://horstmann.com/unblog/2011-05-12/blog.html
+https://cs.lmu.edu/~ray/notes/redblacktrees/
+https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/
+https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/11-Redblack.pdf
+
+Definition:
+    Red-black tree is a binary search tree with the following additional properties:
+        1. Every node is colored red or black
+        2. The root is always black (root rule)
+        3. All leaves are null and they are black
+        4. No double reds rule: A red node cannot have a red child. If a node is red, then both its children are black (red rule)
+        5. Any path from a given node to any of its descendant leaves contains the same amount of black nodes. This is
+        sometimes known as the black-depth if the given node is the root
+
+
+When to use:
+    The AVL tree has more balanced compares to Red-black tree, but they may cause more rotations during insertion and deletion.
+    If your application involves many frequent insertions and deletions, the Red-black tree should be preferred.
+
+Terms:
+    Black-height is number of black nodes on a path from root to leaf
+
+Characteristic
+    - A Red-Black Tree of height h has black-height >= h/2.
+    - Every Red Black Tree with n nodes has height <= 2Log2(n+1)
+
+Important:
+    - Proving the height of the Red-black tree is especially important because the height is what allow us to calcualte
+    its asymptotic
+    - Duplicate key always go right
+
+Operations:
+    Node:
+        Recolor / FlipColor
+
+    Tree:
+        Insert
+            The algorithm has three steps:
+            Insert as you would into a BST, coloring the node red.
+            If the parent of the node you just inserted was red, you have a double-red problem which you must correct.
+            Color the root node black.
+            A double red problem is corrected with zero or more recolorings followed by zero or one restructuring.
+        Delete
+
+        Search
+
+
+
+https://www.programiz.com/dsa/red-black-tree
