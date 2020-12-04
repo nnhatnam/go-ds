@@ -1,0 +1,32 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Data structures – Posts</title>
+    <link>https://nnhatnam.github.io/posts/</link>
+    <description>Recent content in Posts on Data structures</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 03 Dec 2020 21:47:40 -0600</lastBuildDate>
+    
+	  <atom:link href="https://nnhatnam.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Posts: My First Post</title>
+      <link>https://nnhatnam.github.io/posts/my-first-post/</link>
+      <pubDate>Thu, 03 Dec 2020 21:47:40 -0600</pubDate>
+      
+      <guid>https://nnhatnam.github.io/posts/my-first-post/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>
