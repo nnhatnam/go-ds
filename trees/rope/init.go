@@ -1,6 +1,10 @@
 package rope
 
 //https://www.ibm.com/developerworks/library/j-ropes/j-ropes-pdf.pdf
+//http://ahmadsoft.org/source/xref/ropes-1.2.5/src/org/ahmadsoft/ropes/impl/
+//https://www.cs.unm.edu/~crowley/papers/sds.pdf
+//https://www.sanfoundry.com/java-program-implement-rope/
+//https://iq.opengenus.org/rope-data-structure/
 
 const (
 

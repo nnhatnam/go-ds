@@ -17,7 +17,7 @@ func (r *FlatRope) Depth() byte {
 }
 
 func (r *FlatRope) ToString() string {
-	return ""
+	return string(r.buf)
 }
 
 func (r *FlatRope) CharAt(index int) string {
